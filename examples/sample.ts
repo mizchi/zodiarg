@@ -1,24 +1,35 @@
-// npx ts-node examples/sample.ts --name mizchi --age 35 --dry --active false xxx 1
+// npx ts-node examples/sample.ts --name mizchi --age 34 --dry --active false xxx 1
 import { z } from "zod";
+import { asNumberString, parse } from "..";
 
-import { define, asNumber, asBoolean, run } from "..";
-
-const cliSchema = define({
-  options: {
-    name: z.string().describe(": input your name"),
-    age: asNumber.describe(": xxx"),
-    active: asBoolean
+const parsed = parse(
+  // zod schema subset
+  {
+    options: {
+      name: z.string().describe("input your name"),
+      env: z.enum(['a', 'b']).describe("env"),
+      age: asNumberString.default('1').describe("xxx"),
+    },
+    flags: {
+      dry: z.boolean().default(false),
+      shortable: z.boolean().default(false).describe("shortable example"),
+    },
+    args: [
+      z.string().describe("input your first name"),
+      z.string().regex(/^\d+$/).transform(Number)
+    ],
+    alias: {
+      s: 'shortable',
+    }
   },
-  flags: {
-    dry: z.boolean().default(false),
-  },
-  args: [
-    z.string().describe(": input your first name"),
-    z.string().regex(/^\d+$/).transform(Number)
-  ]
-});
-
-const parsed = run(cliSchema, process.argv.slice(2));
+  // args: string[]
+  process.argv.slice(2),
+  // Optional options
+  // {
+  //   help: true, // default: true
+  //   helpWithNoArgs: true, // default: false
+  // }
+);
 
 type ParsedInput = typeof parsed;
 
