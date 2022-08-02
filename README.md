@@ -1,37 +1,46 @@
 # zodiarg
 
-Cli Argumentns Parser with zod validator.
+Cli Arguments Parser with [Zod](https://github.com/colinhacks/zod) validator.
 
 ```
-npm install --save zodiarg
+$ npm install --save zodiarg zod
 ```
 
 ## Example
 
 ```ts
-// npx ts-node examples/sample.ts --name mizchi --age 34 --dry --active false xxx 1
+// npx ts-node examples/sample.ts --name mizchi --age 34 --dry xxx 1
 import { z } from "zod";
 import { asNumberString, asBooleanString, parse } from "zodiarg";
 
-const parsed = parse({
-  options: {
-    name: z.string().describe("input your name"),
-    env: z.enum(['a', 'b']).describe("env"),
-    age: asNumberString.default('1').describe("xxx"), // parse as number
-    active: asBooleanString.default('false') // parse as boolean
+const parsed = parse(
+  {
+    // --key value | --key=value
+    options: {
+      name: z.string().describe("input your name"),
+      env: z.enum(['a', 'b']).describe("env"),
+      age: asNumberString.default('1').describe("xxx"), // parse as number
+      active: asBooleanString.default('false') // parse as boolean
+    },
+    // --flagA, --flagB
+    flags: {
+      dry: z.boolean().default(false),
+      shortable: z.boolean().default(false).describe("shortable example"),
+    },
+    // ... positional args: miz 10
+    args: [
+      z.string().describe("input your first name"),
+      z.string().regex(/^\d+$/).transform(Number)
+    ],
+    // alias map: s => shortable
+    alias: {
+      s: 'shortable',
+    }
   },
-  flags: {
-    dry: z.boolean().default(false),
-    shortable: z.boolean().default(false).describe("shortable example"),
-  },
-  args: [
-    z.string().describe("input your first name"),
-    z.string().regex(/^\d+$/).transform(Number)
-  ],
-  alias: {
-    s: 'shortable',
-  }
-}, process.argv.slice(2), /* override command help */ { help: true /* default: true */ });
+  process.argv.slice(2),
+  // Options(default)
+  // { help: true, helpWithNoArgs: true }
+);
 
 type ParsedInput = typeof parsed; // Inferenced by Zod
 
@@ -60,7 +69,7 @@ Parsed Input {
 Show help
 
 ```
-$ npx ts-node examples/sample.ts
+$ npx ts-node examples/sample.ts -h
 OPTIONS:
   --name <string>       input your name
   --env <enum: [a] [b]> env
