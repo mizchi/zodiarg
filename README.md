@@ -74,7 +74,6 @@ OPTIONS:
   --name <string>       input your name
   --env <enum: [a] [b]> env
   --age (Optional: 1)   xxx
-  --active (Optional: true)     active
 FLAGS:
   --dry
   --shortable, -s       shortable example
