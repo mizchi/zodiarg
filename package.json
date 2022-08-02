@@ -1,6 +1,6 @@
 {
   "name": "zodiarg",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "cli parse with zod",
   "main": "index.js",
   "types": "index.d.ts",

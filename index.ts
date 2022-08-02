@@ -3,10 +3,10 @@ import { z, ZodTypeAny } from "zod";
 type PositionalTuple = Parameters<typeof z.tuple>[0];
 
 export type ZodCliSchema<Options extends z.ZodRawShape, Flags extends z.ZodRawShape, Positional extends PositionalTuple> = {
-  alias?: {[key: string]: keyof (Options & Flags)},
-  options?: Options,
-  flags?: Flags,
-  args?: Positional
+  alias: {[key: string]: keyof (Options & Flags)},
+  options: Options,
+  flags: Flags,
+  args: Positional
 };
 
 export const define = <Options extends z.ZodRawShape, Flags extends z.ZodRawShape, Positional extends PositionalTuple>(

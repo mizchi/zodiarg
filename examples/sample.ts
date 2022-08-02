@@ -40,4 +40,6 @@ main(parsed).catch((err) => {
 
 async function main(input: ParsedInput) {
   console.log('Parsed Input', input);
+  // input.options
+  // input.options.name = 1;
 }
