@@ -97,25 +97,31 @@ function toZodShape<Options extends z.ZodRawShape, Flags extends z.ZodRawShape, 
 
 export function _parse<Options extends z.ZodRawShape, Flags extends z.ZodRawShape, Positional extends PositionalTuple>(schema: ZodCliSchema<Options, Flags, Positional>, args: string[]) {
   const obj = toObject(schema, args);
-  return toZodShape(schema).safeParse(obj);
+  return { result: toZodShape(schema).safeParse(obj), help: obj.flags.help as boolean ?? false };
 }
 
-export function parse<Options extends z.ZodRawShape, Flags extends z.ZodRawShape, Positional extends PositionalTuple>(schema: ZodCliSchema<Options, Flags, Positional>, args: string[], {help = true, helpWithNoArgs = false}: { help?: boolean, helpWithNoArgs?: boolean } = {}) {
+export function parse<Options extends z.ZodRawShape, Flags extends z.ZodRawShape, Positional extends PositionalTuple>(schema: ZodCliSchema<Options, Flags, Positional>, args: string[], {help = true, helpWithNoArgs = false, helpGenerator = generateHelp }: { help?: boolean, helpWithNoArgs?: boolean, helpGenerator?: typeof generateHelp } = {}) {
   if (helpWithNoArgs && args.length === 0) {
-    console.log(generateHelp(schema as any), '');
+    console.log(helpGenerator(schema as any), '');
     process.exit(0);
   }
-  const result = _parse(schema, args);
+
+  const { result, help: _help } = _parse(schema, args);
   if (result.success) {
     // @ts-ignore
     if (help && (result.data.flags.help || result.data.flags.h)) {
-      console.log(generateHelp(schema as any), '');
+      console.log(helpGenerator(schema as any), '');
       process.exit(0);
     }
     return result.data;
   } else {
-    reportError(result);
-    process.exit(1);
+    if (_help) {
+      console.log(helpGenerator(schema as any), '');
+      process.exit(0);
+    } else {
+      reportError(result);
+      process.exit(1);
+    }
   }
 }
 
