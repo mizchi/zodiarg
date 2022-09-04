@@ -28,6 +28,9 @@ const parsed = parse(
   // {
   //   help: true, // default: true
   //   helpWithNoArgs: true, // default: false
+  //   helpGenerator: (schema) => { // default: build-in help generator
+  //     return `Usage: ${process.argv[1]} [options] [args]`
+  //   }
   // }
 );
 
