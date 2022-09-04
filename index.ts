@@ -100,16 +100,16 @@ export function _parse<Options extends z.ZodRawShape, Flags extends z.ZodRawShap
   return toZodShape(schema).safeParse(obj);
 }
 
-export function parse<Options extends z.ZodRawShape, Flags extends z.ZodRawShape, Positional extends PositionalTuple>(schema: ZodCliSchema<Options, Flags, Positional>, args: string[], {help = true, helpWithNoArgs = false}: { help?: boolean, helpWithNoArgs?: boolean } = {}) {
+export function parse<Options extends z.ZodRawShape, Flags extends z.ZodRawShape, Positional extends PositionalTuple>(schema: ZodCliSchema<Options, Flags, Positional>, args: string[], {help = true, helpWithNoArgs = false, helpGenerator = generateHelp }: { help?: boolean, helpWithNoArgs?: boolean, helpGenerator?: typeof generateHelp } = {}) {
   if (helpWithNoArgs && args.length === 0) {
-    console.log(generateHelp(schema as any), '');
+    console.log(helpGenerator(schema as any), '');
     process.exit(0);
   }
   const result = _parse(schema, args);
   if (result.success) {
     // @ts-ignore
     if (help && (result.data.flags.help || result.data.flags.h)) {
-      console.log(generateHelp(schema as any), '');
+      console.log(helpGenerator(schema as any), '');
       process.exit(0);
     }
     return result.data;
