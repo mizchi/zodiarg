@@ -101,7 +101,7 @@ export function _parse<Options extends z.ZodRawShape, Flags extends z.ZodRawShap
 }
 
 export function parse<Options extends z.ZodRawShape, Flags extends z.ZodRawShape, Positional extends PositionalTuple>(schema: ZodCliSchema<Options, Flags, Positional>, args: string[], {help = true, helpWithNoArgs = false}: { help?: boolean, helpWithNoArgs?: boolean } = {}) {
-  if (helpWithNoArgs && args.length === 0) {
+  if ((helpWithNoArgs && args.length === 0) || (args.length === 1 && (args[0] === '--help' || args[0] === '-h'))) {
     console.log(generateHelp(schema as any), '');
     process.exit(0);
   }
